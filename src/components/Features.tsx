@@ -1,55 +1,87 @@
-import { Check, Zap } from 'lucide-react';
+import { Zap, Compass, ShieldCheck, TrendingUp, BarChart3 } from 'lucide-react';
 
-const features = [
-  'White-label portals and branded touchpoints',
-  'Automated fulfillment workflows',
-  'Secure payment orchestration',
-  'Client journey analytics in real time',
-  'Hybrid human + AI support coverage',
-  'Global compliance alignment',
-  'Dedicated success strategist',
-  'Neon-fast incident response'
+const featureGroups = [
+  {
+    title: 'Precision onboarding',
+    description: 'Bespoke flows greet every customer with your tone of voice, built on our data-backed templates.',
+    icon: Compass,
+    highlight: 'Launch'
+  },
+  {
+    title: 'Operational clarity',
+    description: 'Live dashboards capture fulfilment health, campaign performance and support velocity in one command centre.',
+    icon: BarChart3,
+    highlight: 'Monitor'
+  },
+  {
+    title: 'Trust at scale',
+    description: 'Zero trust infrastructure, multi-factor authentication and proactive incident response keeps customers confident.',
+    icon: ShieldCheck,
+    highlight: 'Secure'
+  },
+  {
+    title: 'Revenue acceleration',
+    description: 'Smart retries, localized payments and loyalty mechanics drive incremental sales and reduce churn.',
+    icon: TrendingUp,
+    highlight: 'Grow'
+  }
 ];
 
 export default function Features() {
   return (
-    <section id="features" className="py-20 px-6 bg-gradient-to-b from-[#050013] via-[#0a0127] to-[#050013] relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-[160px]" />
+    <section className="py-24 px-6 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/3 left-1/4 w-[28rem] h-[28rem] bg-gradient-to-br from-indigo-500/15 via-purple-500/15 to-transparent blur-[200px]" />
+      </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 bg-white/10 border border-white/20 rounded-full backdrop-blur">
-              <Zap className="w-4 h-4 text-sky-300" />
-              <span className="text-sm text-violet-100/90 font-medium">Built for luminous performance</span>
+      <div className="max-w-7xl mx-auto relative">
+        <div className="grid lg:grid-cols-12 gap-16 items-start">
+          <div className="lg:col-span-5 space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs tracking-[0.3em] text-slate-300">
+              <Zap className="w-4 h-4 text-sky-200" /> PLATFORM
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Everything You Need,
-              <br />
-              <span className="bg-gradient-to-r from-fuchsia-300 via-purple-200 to-sky-200 bg-clip-text text-transparent">
-                With None of the Friction
-              </span>
+            <h2 className="text-4xl md:text-5xl font-semibold text-white">
+              A commerce engine crafted for modern digital brands.
             </h2>
-            <p className="text-violet-100/80 text-lg mb-8 leading-relaxed">
-              Eclipse Hub merges neon aesthetics with enterprise rigor. Our orchestrated delivery stack keeps your clients
-              thrilled while your team scales effortlessly.
+            <p className="text-lg text-slate-300 leading-relaxed">
+              Eclipse Hub coordinates every touchpoint from the first pixel to ongoing loyalty. Our platform pairs human expertise with reliable automation so your products arrive with theatre and precision.
             </p>
-            <button className="bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-400 text-white px-8 py-3 rounded-xl font-medium hover:from-fuchsia-400 hover:via-purple-400 hover:to-sky-300 transition-all shadow-[0_20px_50px_rgba(124,58,237,0.35)]">
-              Discover the Eclipse Method
-            </button>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-4">
+              <p className="text-sm text-slate-300">
+                “Eclipse reimagined how we launch. What used to take a month now takes a week—and our customers love the polished journey.”
+              </p>
+              <div>
+                <p className="text-sm font-semibold text-white">Monique Vega</p>
+                <p className="text-xs tracking-[0.3em] text-slate-400 uppercase">Head of Digital, NovaSound</p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-white/10 border border-white/15 p-8 rounded-2xl backdrop-blur-lg shadow-[0_25px_60px_rgba(56,189,248,0.25)]">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-start space-x-3 group">
-                  <div className="bg-gradient-to-br from-fuchsia-400 via-purple-400 to-sky-400 rounded-full p-1.5 mt-0.5 group-hover:scale-110 transition-transform">
-                    <Check className="w-3 h-3 text-[#050013]" strokeWidth={3} />
+          <div className="lg:col-span-7 space-y-6">
+            {featureGroups.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={feature.title}
+                  className="relative rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:items-center transition-all hover:border-indigo-400/40 hover:-translate-y-1"
+                  style={{ animation: 'fade-up 0.6s ease-out forwards', animationDelay: `${index * 90}ms`, opacity: 0 }}
+                >
+                  <div className="relative">
+                    <div className="w-14 h-14 rounded-2xl bg-indigo-500/20 border border-white/10 flex items-center justify-center">
+                      <Icon className="w-6 h-6 text-indigo-100" />
+                    </div>
+                    <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-indigo-500/20 text-[11px] uppercase tracking-[0.3em] text-indigo-100">
+                      {feature.highlight}
+                    </span>
                   </div>
-                  <span className="text-violet-100/80 group-hover:text-white transition-colors">{feature}</span>
+
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
+                    <p className="text-sm text-slate-300 leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
       </div>

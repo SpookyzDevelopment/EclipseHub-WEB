@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Star, Package, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ShoppingCart, Heart, Star, Package, CheckCircle, ArrowLeft, Sparkles } from 'lucide-react';
 import { supabaseDataService, Product } from '../services/supabaseDataService';
 import { addToCart } from '../utils/cart';
 import { useAuth } from '../contexts/AuthContext';
@@ -46,14 +46,12 @@ export default function ProductDetail() {
     }
   };
 
-
-
   const toggleWishlist = () => {
     const wishlistData = localStorage.getItem('wishlist');
     let wishlist: string[] = wishlistData ? JSON.parse(wishlistData) : [];
 
     if (inWishlist) {
-      wishlist = wishlist.filter(pid => pid !== id);
+      wishlist = wishlist.filter((pid) => pid !== id);
       setInWishlist(false);
     } else {
       wishlist.push(id!);
@@ -85,7 +83,7 @@ export default function ProductDetail() {
       rating: newReview.rating,
       comment: newReview.comment,
       created_at: new Date().toISOString(),
-      user_id: 'guest'
+      user_id: user?.id || 'guest'
     };
 
     allReviews.push({ ...newReviewItem, product_id: id });
@@ -107,14 +105,12 @@ export default function ProductDetail() {
     setReviews(productReviews);
   }, [id]);
 
-  const averageRating = product?.rating || (reviews.length > 0
-    ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-    : 0);
+  const averageRating = product?.rating || (reviews.length > 0 ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length : 0);
 
   if (loading) {
     return (
       <div className="min-h-screen pt-32 pb-16 px-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500"></div>
+        <div className="w-16 h-16 border-4 border-white/10 border-t-indigo-400 rounded-full animate-spin" />
       </div>
     );
   }
@@ -124,61 +120,79 @@ export default function ProductDetail() {
   const features = Array.isArray(product.features) ? product.features : [];
 
   return (
-    <div className="min-h-screen pt-32 pb-16 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <Link to="/products" className="text-gray-400 hover:text-white transition-colors">
-            ← Back to Products
+    <section className="pt-32 pb-20 px-6 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-5%] right-[-10%] w-[40rem] h-[40rem] bg-gradient-to-br from-indigo-500/15 via-purple-500/15 to-transparent blur-[220px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10 space-y-12">
+        <div className="flex items-center gap-4 text-sm text-slate-300">
+          <Link to="/products" className="inline-flex items-center gap-2 hover:text-white transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Back to catalogue
           </Link>
+          <span className="w-1 h-1 rounded-full bg-white/20" />
+          <span className="uppercase tracking-[0.3em]">Product detail</span>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 mb-16">
-          <div className="aspect-square bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+        <div className="grid lg:grid-cols-2 gap-12">
+          <div className="relative rounded-[32px] border border-white/10 bg-white/5 p-4 overflow-hidden">
+            <div className="relative aspect-square rounded-[28px] bg-[#060b19]/80 overflow-hidden">
+              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              {product.is_featured && (
+                <div className="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-xs font-semibold">
+                  <Sparkles className="w-4 h-4 text-indigo-200" />
+                  Featured Drop
+                </div>
+              )}
+            </div>
           </div>
 
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{product.name}</h1>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-5 h-5 ${i < Math.round(averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
-                  />
-                ))}
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl font-semibold text-white">{product.name}</h1>
+              <div className="flex items-center gap-4 text-sm text-slate-300">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < Math.round(averageRating) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`}
+                    />
+                  ))}
+                </div>
+                <span>({reviews.length} reviews)</span>
+                <span className="w-1 h-1 rounded-full bg-white/20" />
+                <span className="uppercase tracking-[0.3em] text-xs text-slate-400">{product.category}</span>
               </div>
-              <span className="text-gray-400">({reviews.length} reviews)</span>
             </div>
 
-            <p className="text-gray-300 text-lg mb-6 leading-relaxed">{product.description}</p>
+            <p className="text-lg text-slate-300 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6">
+              {product.description}
+            </p>
 
-            <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-5xl font-bold bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent">
-                ${Number(product.price).toFixed(2)}
-              </span>
-              <span className={`px-3 py-1 rounded-full text-sm ${
-                product.stock_status === 'in_stock'
-                  ? 'bg-green-500/20 text-green-400'
-                  : product.stock_status === 'low_stock'
-                  ? 'bg-yellow-500/20 text-yellow-400'
-                  : 'bg-red-500/20 text-red-400'
-              }`}>
+            <div className="flex items-end gap-4">
+              <span className="text-5xl font-semibold text-gradient">${Number(product.price).toFixed(2)}</span>
+              <span
+                className={`px-4 py-2 rounded-full text-xs uppercase tracking-[0.3em] ${
+                  product.stock_status === 'in_stock'
+                    ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                    : product.stock_status === 'low_stock'
+                    ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                    : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                }`}
+              >
                 {product.stock_status?.replace('_', ' ') || 'In Stock'}
               </span>
             </div>
 
             {features.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-xl font-bold mb-4">Key Features</h3>
-                <ul className="space-y-2">
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-3">
+                <h3 className="text-sm uppercase tracking-[0.3em] text-slate-400">What’s inside</h3>
+                <ul className="grid sm:grid-cols-2 gap-3">
                   {features.map((feature: string, index: number) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-300">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <li key={index} className="flex items-start gap-2 text-sm text-slate-200">
+                      <CheckCircle className="w-4 h-4 text-indigo-200 mt-1" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -186,91 +200,92 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
                 disabled={product.stock_status === 'out_of_stock'}
-                className="flex-1 bg-gradient-to-r from-gray-600 to-gray-500 text-white py-4 rounded-lg font-medium hover:from-gray-500 hover:to-gray-400 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 btn-gradient py-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <ShoppingCart className="w-5 h-5" />
-                Add to Cart
+                Add to cart
               </button>
               <button
                 onClick={toggleWishlist}
-                className={`p-4 rounded-lg border transition-all ${
+                className={`px-6 py-4 rounded-xl border text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
                   inWishlist
-                    ? 'bg-red-500/20 border-red-500/50 text-red-400'
-                    : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
+                    ? 'border-rose-400/40 bg-rose-500/10 text-rose-200'
+                    : 'border-white/15 bg-white/5 text-slate-200 hover:border-indigo-400/40'
                 }`}
               >
-                <Heart className={`w-6 h-6 ${inWishlist ? 'fill-current' : ''}`} />
+                <Heart className={`w-5 h-5 ${inWishlist ? 'fill-current' : ''}`} />
+                {inWishlist ? 'In wishlist' : 'Save for later'}
               </button>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-16">
-          <h2 className="text-3xl font-bold mb-8">Customer Reviews</h2>
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 space-y-8">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <h2 className="text-2xl font-semibold text-white">Customer reviews</h2>
+            <span className="text-sm text-slate-400">Share your experience to help other Eclipse partners.</span>
+          </div>
 
-          <form onSubmit={handleSubmitReview} className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-gray-800 rounded-lg p-6 mb-8">
-              <h3 className="text-xl font-bold mb-4">Write a Review</h3>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Rating</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      type="button"
-                      onClick={() => setNewReview({ ...newReview, rating })}
-                      className="p-2 hover:scale-110 transition-transform"
-                    >
-                      <Star
-                        className={`w-8 h-8 ${rating <= newReview.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
-                      />
-                    </button>
-                  ))}
-                </div>
+          <form onSubmit={handleSubmitReview} className="grid lg:grid-cols-2 gap-6">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+              <h3 className="text-sm uppercase tracking-[0.3em] text-slate-400">Your rating</h3>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <button
+                    key={rating}
+                    type="button"
+                    onClick={() => setNewReview({ ...newReview, rating })}
+                    className="p-2 rounded-full hover:bg-white/10 transition"
+                  >
+                    <Star
+                      className={`w-7 h-7 ${rating <= newReview.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`}
+                    />
+                  </button>
+                ))}
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Comment</label>
-                <textarea
-                  value={newReview.comment}
-                  onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:border-gray-600 transition-colors min-h-[100px]"
-                  placeholder="Share your thoughts about this product..."
-                />
-              </div>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+              <h3 className="text-sm uppercase tracking-[0.3em] text-slate-400">Your review</h3>
+              <textarea
+                value={newReview.comment}
+                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                className="w-full min-h-[120px] rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-slate-200 placeholder:text-slate-500 focus:border-indigo-400/40 transition"
+                placeholder="Share how Eclipse helped your launch..."
+              />
               <button
                 type="submit"
                 disabled={submittingReview}
-                className="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:from-gray-500 hover:to-gray-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-gradient px-6 py-3 rounded-xl text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submittingReview ? 'Submitting...' : 'Submit Review'}
+                {submittingReview ? 'Submitting...' : 'Publish review'}
               </button>
-            </form>
+            </div>
+          </form>
 
           {reviews.length === 0 ? (
-            <div className="text-center py-12 bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-gray-800 rounded-lg">
-              <Package className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-              <p className="text-gray-400">No reviews yet. Be the first to review this product!</p>
+            <div className="text-center py-12 bg-white/5 border border-white/10 rounded-3xl">
+              <Package className="w-12 h-12 text-indigo-200 mx-auto mb-4" />
+              <p className="text-slate-300">No reviews yet. Be the first to share your story.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-6">
               {reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-gray-800 rounded-lg p-6"
-                >
-                  <div className="flex items-center gap-2 mb-2">
+                <div key={review.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
+                  <div className="flex items-center gap-2">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
+                        className={`w-4 h-4 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-600'}`}
                       />
                     ))}
                   </div>
-                  <p className="text-gray-300 mb-2">{review.comment}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-slate-200 leading-relaxed">{review.comment}</p>
+                  <p className="text-xs text-slate-500 uppercase tracking-[0.25em]">
                     {new Date(review.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -283,6 +298,6 @@ export default function ProductDetail() {
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

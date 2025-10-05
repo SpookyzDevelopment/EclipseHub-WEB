@@ -35,10 +35,17 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050013] via-[#060021] to-[#050013] text-white">
-      <Header />
-      {children}
-      <Footer />
+    <div className="min-h-screen text-slate-100 relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -left-32 w-[32rem] h-[32rem] bg-indigo-500/20 blur-[160px]" />
+        <div className="absolute top-1/3 -right-20 w-[30rem] h-[30rem] bg-sky-500/10 blur-[180px]" />
+        <div className="absolute bottom-0 left-1/3 w-[40rem] h-[40rem] bg-purple-600/10 blur-[220px]" />
+      </div>
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1 pt-20">{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 }
