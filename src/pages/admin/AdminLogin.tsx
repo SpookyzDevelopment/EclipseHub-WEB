@@ -51,7 +51,7 @@ export default function AdminLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none transition-colors"
-                  placeholder="admin@alxne.com"
+                  placeholder="admin@eclipcestore.digital"
                   required
                 />
               </div>
