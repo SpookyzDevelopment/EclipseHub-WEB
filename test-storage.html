@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Storage Test</title>
+</head>
+<body>
+    <h1>Testing localStorage</h1>
+    <button onclick="testData()">Test Data Flow</button>
+    <div id="output"></div>
+    
+    <script type="module">
+        // Import the data service
+        import { dataService } from './src/services/dataService.ts';
+        
+        window.testData = function() {
+            const output = document.getElementById('output');
+            
+            // Get products
+            const products = dataService.getProducts();
+            output.innerHTML = `<pre>${JSON.stringify(products, null, 2)}</pre>`;
+            
+            // Test creating a product
+            const newProduct = dataService.createProduct({
+                name: 'Test Product',
+                description: 'Test Description',
+                price: 99.99,
+                category: 'Test',
+                image_url: 'https://via.placeholder.com/300',
+                is_featured: false,
+                stock_status: 'in_stock',
+                rating: 4.5,
+                features: ['Feature 1', 'Feature 2']
+            });
+            
+            console.log('Created product:', newProduct);
+            
+            // Get products again
+            const updatedProducts = dataService.getProducts();
+            console.log('Updated products:', updatedProducts);
+        };
+    </script>
+</body>
+</html>
