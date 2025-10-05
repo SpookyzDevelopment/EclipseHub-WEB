@@ -3,23 +3,23 @@ import Breadcrumbs from '../components/Breadcrumbs';
 
 export default function PrivacyPolicy() {
   return (
-    <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-black via-gray-950 to-black min-h-screen">
+    <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-[#050013] via-[#0b0121] to-[#050013] min-h-screen">
       <div className="max-w-4xl mx-auto">
         <Breadcrumbs />
 
         <div className="mb-12 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Shield className="w-12 h-12 text-gray-400" />
+            <Shield className="w-12 h-12 text-sky-300" />
             <h1 className="text-5xl font-bold">
-              <span className="bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-fuchsia-300 via-purple-200 to-sky-200 bg-clip-text text-transparent">
                 Privacy Policy
               </span>
             </h1>
           </div>
-          <p className="text-gray-400">Last updated: {new Date().toLocaleDateString()}</p>
+          <p className="text-violet-100/70">Last updated: {new Date().toLocaleDateString()}</p>
         </div>
 
-        <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-8 space-y-8 text-gray-300">
+        <div className="bg-white/10 border border-white/15 rounded-2xl p-8 space-y-8 text-violet-100/80 shadow-[0_25px_60px_rgba(56,189,248,0.25)]">
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">1. Information We Collect</h2>
             <p className="mb-4">We collect the following types of information:</p>
@@ -99,7 +99,7 @@ export default function PrivacyPolicy() {
               <li>Withdraw consent at any time</li>
             </ul>
             <p className="mt-4">
-              To exercise these rights, contact us at privacy@alxne.com
+              To exercise these rights, contact us at privacy@eclipcestore.digital
             </p>
           </section>
 
@@ -157,10 +157,10 @@ export default function PrivacyPolicy() {
             <p className="mb-4">
               For questions or concerns about this Privacy Policy or our data practices:
             </p>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-              <p>Email: privacy@alxne.com</p>
-              <p>Support: support@alxne.com</p>
-              <p className="mt-2">Data Protection Officer: dpo@alxne.com</p>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <p>Email: privacy@eclipcestore.digital</p>
+              <p>Support: support@eclipcestore.digital</p>
+              <p className="mt-2">Data Protection Officer: dpo@eclipcestore.digital</p>
             </div>
           </section>
         </div>
