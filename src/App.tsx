@@ -35,7 +35,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#050013] via-[#060021] to-[#050013] text-white">
       <Header />
       {children}
       <Footer />

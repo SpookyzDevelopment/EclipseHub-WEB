@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Tag, Plus, Calendar, Percent, Check, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Calendar, Check, Percent, Plus, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
 import { supabaseDataService, Product, SalesCampaign } from '../../services/supabaseDataService';
 import AdminLayout from '../../components/admin/AdminLayout';
 
@@ -17,7 +17,7 @@ export default function Sales() {
     try {
       const [campaignsData, productsData] = await Promise.all([
         supabaseDataService.getSalesCampaigns(),
-        supabaseDataService.getProducts()
+        supabaseDataService.getProducts(),
       ]);
 
       setCampaigns(campaignsData);
@@ -38,11 +38,10 @@ export default function Sales() {
         start_date: campaign.start_date!,
         end_date: campaign.end_date!,
         active: campaign.active || false,
-        product_ids: campaign.product_ids || []
+        product_ids: campaign.product_ids || [],
       });
 
       if (newCampaign) {
-        console.log('✅ Sales campaign created:', newCampaign.name);
         fetchData();
         setShowCreateModal(false);
         alert('Campaign created successfully! It is now live on the website.');
@@ -60,7 +59,6 @@ export default function Sales() {
       const updated = await supabaseDataService.updateSalesCampaign(id, { active: !active });
 
       if (updated) {
-        console.log('✅ Sales campaign toggled:', updated.name, '- Active:', updated.active);
         fetchData();
         alert(`Campaign ${updated.active ? 'activated' : 'deactivated'} successfully! Changes are now live on the website.`);
       } else {
@@ -72,109 +70,127 @@ export default function Sales() {
     }
   };
 
+  const activeCampaigns = useMemo(() => campaigns.filter((c) => c.active).length, [campaigns]);
+
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="w-16 h-16 border-4 border-gray-500/30 border-t-gray-500 rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-[#040011]">
+        <div className="relative">
+          <div className="h-20 w-20 rounded-full border-4 border-purple-500/20" />
+          <div className="absolute inset-0 m-auto h-20 w-20 animate-spin rounded-full border-4 border-t-purple-400/80 border-transparent" />
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Tag className="w-8 h-8 text-red-400" />
-              <h1 className="text-4xl font-bold">Sales & Discounts</h1>
-            </div>
-            <p className="text-gray-400">Create and manage discount campaigns</p>
-          </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-3 rounded-lg font-medium hover:from-red-500 hover:to-red-400 transition-all"
-          >
-            <Plus className="w-5 h-5" />
-            New Campaign
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-6">
-        {campaigns.map((campaign) => (
-          <div
-            key={campaign.id}
-            className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 hover:border-gray-700 transition-all"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xl font-bold">{campaign.name}</h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      campaign.active
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                    }`}
-                  >
-                    {campaign.active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <p className="text-gray-400 mb-4">{campaign.description}</p>
-
-                <div className="grid md:grid-cols-3 gap-4 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Percent className="w-4 h-4 text-red-400" />
-                    <span className="text-sm">
-                      <span className="font-bold text-red-400">{campaign.discount_percentage}%</span>{' '}
-                      off
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">
-                      {new Date(campaign.start_date).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">
-                      {new Date(campaign.end_date).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-400 mb-2">
-                    {campaign.product_ids.length} products included
-                  </p>
-                </div>
+      <div className="space-y-10">
+        <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-900/40 via-fuchsia-900/20 to-transparent p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-purple-100">
+                <Tag className="h-4 w-4" />
+                Sales studio
               </div>
+              <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Animate the next neon drop</h1>
+              <p className="mt-2 max-w-2xl text-sm text-white/70">
+                Launch targeted discount campaigns, orchestrate bundles, and keep the hype alive across eclipcestore.digital.
+              </p>
+            </div>
 
+            <div className="flex flex-col items-end gap-3 text-right">
+              <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-2 text-xs uppercase tracking-[0.3em] text-white/60">
+                {activeCampaigns} active campaigns
+              </div>
               <button
-                onClick={() => toggleCampaign(campaign.id, campaign.active)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  campaign.active
-                    ? 'bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600/30'
-                    : 'bg-green-600/20 text-green-400 border border-green-500/30 hover:bg-green-600/30'
-                }`}
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-6 py-3 text-sm font-medium text-purple-100 transition-all hover:border-purple-300 hover:bg-purple-500/20"
               >
-                {campaign.active ? 'Deactivate' : 'Activate'}
+                <Plus className="h-4 w-4" />
+                New campaign
               </button>
             </div>
           </div>
-        ))}
-      </div>
+        </section>
 
-      {campaigns.length === 0 && (
-        <div className="text-center py-12 bg-gray-900/50 border border-gray-800 rounded-lg">
-          <Tag className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-          <p className="text-gray-400">No campaigns yet</p>
-        </div>
-      )}
+        <section className="space-y-6">
+          {campaigns.map((campaign) => (
+            <div
+              key={campaign.id}
+              className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+            >
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="text-2xl font-semibold text-white">{campaign.name}</h2>
+                    <span
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] ${
+                        campaign.active
+                          ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-100'
+                          : 'border-white/20 bg-black/30 text-white/50'
+                      }`}
+                    >
+                      {campaign.active ? (
+                        <ToggleRight className="h-3 w-3" />
+                      ) : (
+                        <ToggleLeft className="h-3 w-3" />
+                      )}
+                      {campaign.active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                  <p className="max-w-2xl text-sm text-white/60">{campaign.description}</p>
+
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white/70">
+                      <span className="text-xs uppercase tracking-[0.3em] text-white/50">Discount</span>
+                      <p className="mt-2 flex items-center gap-2 text-2xl font-semibold text-emerald-300">
+                        <Percent className="h-5 w-5" />
+                        {campaign.discount_percentage}%
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white/70">
+                      <span className="text-xs uppercase tracking-[0.3em] text-white/50">Starts</span>
+                      <p className="mt-2 flex items-center gap-2 text-white">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(campaign.start_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-white/70">
+                      <span className="text-xs uppercase tracking-[0.3em] text-white/50">Ends</span>
+                      <p className="mt-2 flex items-center gap-2 text-white">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(campaign.end_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-dashed border-white/20 bg-black/30 p-4 text-xs uppercase tracking-[0.3em] text-white/50">
+                    {campaign.product_ids.length} products in orbit
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => toggleCampaign(campaign.id, campaign.active)}
+                  className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-medium transition-all ${
+                    campaign.active
+                      ? 'border-rose-400/40 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20'
+                      : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20'
+                  }`}
+                >
+                  {campaign.active ? 'Deactivate' : 'Activate'}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {campaigns.length === 0 && (
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-white/60">
+              No campaigns yet. Launch your first neon promo.
+            </div>
+          )}
+        </section>
+      </div>
 
       {showCreateModal && (
         <CampaignModal
@@ -200,138 +216,144 @@ function CampaignModal({
     name: '',
     description: '',
     discount_percentage: 10,
-    start_date: new Date().toISOString().split('T')[0],
-    end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    start_date: new Date().toISOString().slice(0, 10),
+    end_date: new Date().toISOString().slice(0, 10),
     active: true,
     product_ids: [] as string[],
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave({
-      ...formData,
-      start_date: new Date(formData.start_date).toISOString(),
-      end_date: new Date(formData.end_date).toISOString(),
-    });
+  const toggleProduct = (id: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      product_ids: prev.product_ids.includes(id)
+        ? prev.product_ids.filter((pid) => pid !== id)
+        : [...prev.product_ids, id],
+    }));
   };
 
-  const toggleProduct = (productId: string) => {
-    setFormData({
-      ...formData,
-      product_ids: formData.product_ids.includes(productId)
-        ? formData.product_ids.filter((id) => id !== productId)
-        : [...formData.product_ids, productId],
-    });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50 overflow-y-auto"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 py-10 backdrop-blur" onClick={onClose}>
       <div
-        className="bg-gray-900 border border-gray-800 rounded-lg p-8 max-w-3xl w-full my-8"
+        className="w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#06001b] text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold mb-6">Create Sales Campaign</h2>
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <h3 className="text-xl font-semibold">Create campaign</h3>
+          <button
+            onClick={onClose}
+            className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs text-white/60 transition-all hover:border-white/30 hover:text-white"
+          >
+            Close
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Campaign Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={2}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none resize-none"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">Discount (%)</label>
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-6">
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Campaign name</label>
               <input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.discount_percentage}
-                onChange={(e) =>
-                  setFormData({ ...formData, discount_percentage: parseInt(e.target.value) })
-                }
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
                 required
               />
             </div>
 
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
+              />
+            </div>
+
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Start Date</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Discount %</label>
+              <input
+                type="number"
+                value={formData.discount_percentage}
+                onChange={(e) => setFormData({ ...formData, discount_percentage: Number(e.target.value) })}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
+                min={1}
+                max={100}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Active</label>
+              <select
+                value={formData.active ? 'true' : 'false'}
+                onChange={(e) => setFormData({ ...formData, active: e.target.value === 'true' })}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
+              >
+                <option value="true">Active</option>
+                <option value="false">Draft</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Start date</label>
               <input
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
-                required
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">End Date</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">End date</label>
               <input
                 type="date"
                 value={formData.end_date}
                 onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
-                required
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-3">
-              Select Products ({formData.product_ids.length} selected)
-            </label>
-            <div className="max-h-60 overflow-y-auto border border-gray-800 rounded-lg p-4 space-y-2">
-              {products.map((product) => (
-                <label
-                  key={product.id}
-                  className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.product_ids.includes(product.id)}
-                    onChange={() => toggleProduct(product.id)}
-                    className="w-4 h-4"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-400">${product.price}</p>
-                  </div>
-                </label>
-              ))}
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Select products</label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {products.map((product) => {
+                const active = formData.product_ids.includes(product.id);
+                return (
+                  <button
+                    type="button"
+                    key={product.id}
+                    onClick={() => toggleProduct(product.id)}
+                    className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
+                      active
+                        ? 'border-purple-400/40 bg-purple-500/10 text-white'
+                        : 'border-white/10 bg-black/40 text-white/70 hover:border-purple-400/40 hover:text-white'
+                    }`}
+                  >
+                    <span>{product.name || 'Untitled product'}</span>
+                    {active && <Check className="h-4 w-4 text-purple-100" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-3 rounded-lg font-medium hover:from-red-500 hover:to-red-400 transition-all"
+              className="rounded-2xl border border-purple-400/40 bg-gradient-to-r from-purple-500 to-fuchsia-500 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-all hover:shadow-[0_0_35px_rgba(168,85,247,0.35)]"
             >
-              Create Campaign
+              Launch campaign
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+              className="rounded-2xl border border-white/10 bg-black/40 px-6 py-3 text-sm font-medium text-white/70 transition-all hover:border-white/30 hover:text-white"
             >
               Cancel
             </button>

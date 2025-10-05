@@ -1,4 +1,4 @@
-import { Shield, Menu, X, ShoppingBag, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Shield, Menu, X, ShoppingBag, User, LogOut, LayoutDashboard, Activity } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import CartButton from './CartButton';
@@ -34,46 +34,75 @@ export default function Header() {
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault();
+    const target = sectionId.startsWith('#') ? sectionId : `#${sectionId}`;
     if (location.pathname !== '/') {
-      window.location.href = `/#${sectionId}`;
+      window.location.href = `/${target}`;
     } else {
-      const element = document.querySelector(sectionId);
+      const element = document.querySelector(target);
       element?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-black/95 border-b border-gray-800/50 shadow-lg' : 'bg-transparent'} backdrop-blur-md`}>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-[#07001a]/95 border-b border-purple-500/30 shadow-[0_20px_50px_rgba(124,58,237,0.35)]'
+          : 'bg-transparent'
+      } backdrop-blur-xl`}
+    >
       <nav className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="relative">
-              <Shield className="w-8 h-8 text-white group-hover:scale-110 transition-transform" strokeWidth={1.5} />
-              <div className="absolute inset-0 bg-gray-500 blur-lg opacity-0 group-hover:opacity-50 transition-opacity" />
+              <Shield className="w-8 h-8 text-fuchsia-400 group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+              <div className="absolute inset-0 bg-fuchsia-500 blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
             </div>
-            <span className="text-2xl font-bold tracking-wider bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              ALXNE
+            <span className="text-2xl font-bold tracking-wider bg-gradient-to-r from-fuchsia-300 via-purple-200 to-sky-200 bg-clip-text text-transparent">
+              Eclipse Hub
             </span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
             <Link
               to="/"
-              className={`transition-colors ${isActive('/') ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}`}
+              className={`transition-colors ${
+                isActive('/') ? 'text-white font-semibold' : 'text-violet-200/70 hover:text-white'
+              }`}
             >
               Home
             </Link>
             <Link
               to="/products"
-              className={`flex items-center gap-1 transition-colors ${isActive('/products') ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}`}
+              className={`flex items-center gap-1 transition-colors ${
+                isActive('/products')
+                  ? 'text-white font-semibold'
+                  : 'text-violet-200/70 hover:text-white'
+              }`}
             >
               <ShoppingBag className="w-4 h-4" />
-              Products
+              Shop
             </Link>
-            <a href="#pricing" onClick={(e) => scrollToSection(e, '#pricing')} className="text-gray-400 hover:text-white transition-colors">
-              Pricing
+            <a
+              href="#collections"
+              onClick={(e) => scrollToSection(e, '#collections')}
+              className="text-violet-200/70 hover:text-white transition-colors"
+            >
+              Collections
             </a>
-            <a href="#contact" onClick={(e) => scrollToSection(e, '#contact')} className="text-gray-400 hover:text-white transition-colors">
+            <a
+              href="#status"
+              onClick={(e) => scrollToSection(e, '#status')}
+              className="flex items-center gap-1 text-violet-200/70 hover:text-white transition-colors"
+            >
+              <Activity className="w-4 h-4" />
+              Live Status
+            </a>
+            <a
+              href="#contact"
+              onClick={(e) => scrollToSection(e, '#contact')}
+              className="text-violet-200/70 hover:text-white transition-colors"
+            >
               Contact
             </a>
             <NotificationBell />
@@ -82,16 +111,16 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#120437]/80 border border-purple-500/40 rounded-lg hover:bg-[#1c0652]/80 transition-colors"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm">{user.email?.split('@')[0]}</span>
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-lg shadow-xl animate-in">
+                  <div className="absolute right-0 mt-2 w-48 bg-[#0b011f]/95 border border-purple-500/30 rounded-xl shadow-[0_20px_45px_rgba(124,58,237,0.35)] animate-in">
                     <Link
                       to="/dashboard"
-                      className="block px-4 py-2 text-gray-300 hover:bg-gray-800 transition-colors flex items-center gap-2"
+                      className="block px-4 py-2 text-violet-100/80 hover:bg-purple-600/20 transition-colors flex items-center gap-2"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       <LayoutDashboard className="w-4 h-4" />
@@ -99,21 +128,21 @@ export default function Header() {
                     </Link>
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-gray-300 hover:bg-gray-800 transition-colors"
+                      className="block px-4 py-2 text-violet-100/80 hover:bg-purple-600/20 transition-colors"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       My Profile
                     </Link>
                     <Link
                       to="/orders"
-                      className="block px-4 py-2 text-gray-300 hover:bg-gray-800 transition-colors"
+                      className="block px-4 py-2 text-violet-100/80 hover:bg-purple-600/20 transition-colors"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
                       to="/wishlist"
-                      className="block px-4 py-2 text-gray-300 hover:bg-gray-800 transition-colors"
+                      className="block px-4 py-2 text-violet-100/80 hover:bg-purple-600/20 transition-colors"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       Wishlist
@@ -123,7 +152,7 @@ export default function Header() {
                         signOut();
                         setUserMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2 text-rose-400 hover:bg-purple-600/20 transition-colors flex items-center gap-2"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out
@@ -134,9 +163,9 @@ export default function Header() {
             ) : (
               <button
                 onClick={() => setAuthModalOpen(true)}
-                className="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-6 py-2 rounded-lg font-medium hover:from-gray-500 hover:to-gray-400 transition-all hover:scale-105 shadow-lg shadow-gray-500/25"
+                className="bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-400 text-white px-6 py-2 rounded-lg font-medium hover:from-fuchsia-400 hover:via-purple-400 hover:to-sky-300 transition-all hover:scale-105 shadow-[0_15px_40px_rgba(56,189,248,0.35)]"
               >
-                Get Started
+                Sign In / Join
               </button>
             )}
           </div>
@@ -154,25 +183,55 @@ export default function Header() {
 
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-4 animate-in slide-in-from-top">
-            <Link to="/" className="block text-gray-300 hover:text-white transition-colors">Home</Link>
-            <Link to="/products" className="block text-gray-300 hover:text-white transition-colors flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4" />
-              Products
+            <Link to="/" className="block text-violet-100/80 hover:text-white transition-colors">
+              Home
             </Link>
-            <a href="#pricing" onClick={(e) => scrollToSection(e, '#pricing')} className="block text-gray-300 hover:text-white transition-colors">Pricing</a>
-            <a href="#contact" onClick={(e) => scrollToSection(e, '#contact')} className="block text-gray-300 hover:text-white transition-colors">Contact</a>
+            <Link to="/products" className="block text-violet-100/80 hover:text-white transition-colors flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" />
+              Shop
+            </Link>
+            <a
+              href="#collections"
+              onClick={(e) => scrollToSection(e, '#collections')}
+              className="block text-violet-100/80 hover:text-white transition-colors"
+            >
+              Collections
+            </a>
+            <a
+              href="#status"
+              onClick={(e) => scrollToSection(e, '#status')}
+              className="block text-violet-100/80 hover:text-white transition-colors"
+            >
+              Live Status
+            </a>
+            <a
+              href="#contact"
+              onClick={(e) => scrollToSection(e, '#contact')}
+              className="block text-violet-100/80 hover:text-white transition-colors"
+            >
+              Contact
+            </a>
             {user ? (
               <>
-                <Link to="/dashboard" className="block text-gray-300 hover:text-white transition-colors flex items-center gap-2">
+                <Link
+                  to="/dashboard"
+                  className="block text-violet-100/80 hover:text-white transition-colors flex items-center gap-2"
+                >
                   <LayoutDashboard className="w-4 h-4" />
                   Dashboard
                 </Link>
-                <Link to="/profile" className="block text-gray-300 hover:text-white transition-colors">My Profile</Link>
-                <Link to="/orders" className="block text-gray-300 hover:text-white transition-colors">My Orders</Link>
-                <Link to="/wishlist" className="block text-gray-300 hover:text-white transition-colors">Wishlist</Link>
+                <Link to="/profile" className="block text-violet-100/80 hover:text-white transition-colors">
+                  My Profile
+                </Link>
+                <Link to="/orders" className="block text-violet-100/80 hover:text-white transition-colors">
+                  My Orders
+                </Link>
+                <Link to="/wishlist" className="block text-violet-100/80 hover:text-white transition-colors">
+                  Wishlist
+                </Link>
                 <button
                   onClick={signOut}
-                  className="w-full bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-500 transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-rose-500 to-fuchsia-500 text-white px-6 py-2 rounded-lg font-medium hover:from-rose-400 hover:to-fuchsia-400 transition-all flex items-center justify-center gap-2"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
@@ -181,9 +240,9 @@ export default function Header() {
             ) : (
               <button
                 onClick={() => setAuthModalOpen(true)}
-                className="w-full bg-gradient-to-r from-gray-600 to-gray-500 text-white px-6 py-2 rounded-lg font-medium hover:from-gray-500 hover:to-gray-400 transition-all shadow-lg shadow-gray-500/25"
+                className="w-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-400 text-white px-6 py-2 rounded-lg font-medium hover:from-fuchsia-400 hover:via-purple-400 hover:to-sky-300 transition-all shadow-[0_15px_40px_rgba(56,189,248,0.35)]"
               >
-                Get Started
+                Sign In / Join
               </button>
             )}
           </div>

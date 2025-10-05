@@ -13,6 +13,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  background-color: #050013;
+  color: #f8f7ff;
 }
 
 .line-clamp-1 {
@@ -152,6 +154,68 @@ body {
   animation: shimmer 2s ease-in-out infinite;
 }
 
+@keyframes fadeGlow {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 rgba(236, 72, 153, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.25);
+  }
+}
+
+.animate-fade-glow {
+  animation: fadeGlow 0.9s ease-out forwards;
+}
+
+@keyframes panelFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-panel-float {
+  animation: panelFloat 6s ease-in-out infinite;
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(12px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(12px) rotate(-360deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbit 18s linear infinite;
+}
+
+.animate-orbit-slow {
+  animation: orbit 28s linear infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(236, 72, 153, 0.35);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -171,14 +235,14 @@ select:focus {
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-fuchsia-300 via-purple-200 to-sky-200 bg-clip-text text-transparent;
   }
 
   .btn-gradient {
-    @apply bg-gradient-to-r from-gray-600 to-gray-500 text-white hover:from-gray-500 hover:to-gray-400 transition-all shadow-lg shadow-gray-500/25;
+    @apply bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-400 text-white hover:from-fuchsia-400 hover:via-purple-400 hover:to-sky-300 transition-all shadow-[0_20px_50px_rgba(124,58,237,0.35)];
   }
 
   .card-gradient {
-    @apply bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-gray-800 hover:border-gray-700 transition-all;
+    @apply bg-gradient-to-br from-white/10 via-white/5 to-white/10 border border-white/15 hover:border-fuchsia-400/40 transition-all backdrop-blur;
   }
 }

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { FileText, Plus, DollarSign, Calendar } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Calendar, DollarSign, FileText, Plus, Sparkles } from 'lucide-react';
 import { dataService } from '../../services/dataService';
 import AdminLayout from '../../components/admin/AdminLayout';
 
@@ -31,7 +31,7 @@ export default function Invoices() {
       const orders = dataService.getOrders();
       const customers = dataService.getCustomers();
 
-      const invoiceData: Invoice[] = orders.map(order => ({
+      const invoiceData: Invoice[] = orders.map((order) => ({
         id: order.id,
         user_id: order.user_id,
         stripe_invoice_id: null,
@@ -41,7 +41,7 @@ export default function Invoices() {
         description: order.product_name,
         created_at: order.created_at,
         paid_at: order.status === 'completed' ? order.created_at : null,
-        user_email: order.user_email
+        user_email: order.user_email,
       }));
 
       setInvoices(invoiceData);
@@ -56,7 +56,7 @@ export default function Invoices() {
   const handleCreateInvoice = (invoice: Partial<Invoice>) => {
     try {
       const invoicesData = localStorage.getItem('invoices');
-      const invoices = invoicesData ? JSON.parse(invoicesData) : [];
+      const storedInvoices = invoicesData ? JSON.parse(invoicesData) : [];
 
       const newInvoice: Invoice = {
         id: Date.now().toString(),
@@ -68,11 +68,11 @@ export default function Invoices() {
         description: invoice.description!,
         created_at: new Date().toISOString(),
         paid_at: null,
-        user_email: users.find(u => u.id === invoice.user_id)?.email || 'Unknown'
+        user_email: users.find((u) => u.id === invoice.user_id)?.email || 'Unknown',
       };
 
-      invoices.push(newInvoice);
-      localStorage.setItem('invoices', JSON.stringify(invoices));
+      storedInvoices.push(newInvoice);
+      localStorage.setItem('invoices', JSON.stringify(storedInvoices));
 
       fetchData();
       setShowCreateModal(false);
@@ -83,98 +83,110 @@ export default function Invoices() {
     }
   };
 
+  const totalOutstanding = useMemo(
+    () => invoices.filter((i) => i.status !== 'paid').reduce((sum, inv) => sum + inv.amount, 0),
+    [invoices]
+  );
+
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="w-16 h-16 border-4 border-gray-500/30 border-t-gray-500 rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-[#040011]">
+        <div className="relative">
+          <div className="h-20 w-20 rounded-full border-4 border-purple-500/20" />
+          <div className="absolute inset-0 m-auto h-20 w-20 animate-spin rounded-full border-4 border-t-purple-400/80 border-transparent" />
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <FileText className="w-8 h-8 text-yellow-400" />
-              <h1 className="text-4xl font-bold">Invoices</h1>
+      <div className="space-y-10">
+        <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-900/40 via-fuchsia-900/20 to-transparent p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-purple-100">
+                <FileText className="h-4 w-4" />
+                Billing hub
+              </div>
+              <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Manage statement flow</h1>
+              <p className="mt-2 max-w-2xl text-sm text-white/70">
+                Generate, monitor, and reconcile invoices to keep the neon commerce ledger precise.
+              </p>
             </div>
-            <p className="text-gray-400">Create and manage customer invoices</p>
-          </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white px-6 py-3 rounded-lg font-medium hover:from-yellow-500 hover:to-yellow-400 transition-all"
-          >
-            <Plus className="w-5 h-5" />
-            Create Invoice
-          </button>
-        </div>
-      </div>
 
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-800/50 border-b border-gray-700">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-300">Customer</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-300">Amount</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-300">Status</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-300">Description</th>
-                <th className="text-left px-6 py-4 text-sm font-semibold text-gray-300">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.map((invoice) => (
-                <tr
-                  key={invoice.id}
-                  className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors"
-                >
-                  <td className="px-6 py-4">
-                    <span className="font-medium">{invoice.user_email}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-green-400 font-medium">
-                      <DollarSign className="w-4 h-4" />
-                      {invoice.amount.toFixed(2)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        invoice.status === 'paid'
-                          ? 'bg-green-500/20 text-green-400'
-                          : invoice.status === 'draft'
-                          ? 'bg-gray-500/20 text-gray-400'
-                          : 'bg-yellow-500/20 text-yellow-400'
-                      }`}
-                    >
-                      {invoice.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-gray-400">{invoice.description}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(invoice.created_at).toLocaleDateString()}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {invoices.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-            <p className="text-gray-400">No invoices yet</p>
+            <div className="flex flex-col items-end gap-3 text-right">
+              <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-2 text-xs uppercase tracking-[0.3em] text-white/60">
+                Outstanding ${totalOutstanding.toFixed(2)}
+              </div>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-6 py-3 text-sm font-medium text-purple-100 transition-all hover:border-purple-300 hover:bg-purple-500/20"
+              >
+                <Plus className="h-4 w-4" />
+                Create invoice
+              </button>
+            </div>
           </div>
-        )}
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+          <div className="overflow-hidden rounded-2xl border border-white/10">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-sm">
+                <thead className="bg-white/5 text-left text-xs uppercase tracking-[0.3em] text-white/50">
+                  <tr>
+                    <th className="px-6 py-4">Customer</th>
+                    <th className="px-6 py-4">Amount</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Description</th>
+                    <th className="px-6 py-4">Created</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {invoices.map((invoice) => (
+                    <tr key={invoice.id} className="bg-black/30 transition-colors hover:bg-purple-500/5">
+                      <td className="px-6 py-4 text-white">{invoice.user_email}</td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-100">
+                          <DollarSign className="h-3 w-3" />
+                          {invoice.amount.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] ${
+                            invoice.status === 'paid'
+                              ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-100'
+                              : invoice.status === 'draft'
+                              ? 'border-white/20 bg-black/30 text-white/50'
+                              : 'border-amber-400/40 bg-amber-500/10 text-amber-100'
+                          }`}
+                        >
+                          {invoice.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-white/70">{invoice.description}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-white/60">
+                          <Calendar className="h-4 w-4" />
+                          {new Date(invoice.created_at).toLocaleDateString()}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {invoices.length === 0 && (
+              <div className="flex flex-col items-center gap-2 px-6 py-16 text-white/60">
+                <FileText className="h-12 w-12 text-white/30" />
+                <p>No invoices yet</p>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
 
       {showCreateModal && (
@@ -199,35 +211,50 @@ function InvoiceModal({
 }) {
   const [formData, setFormData] = useState({
     user_id: '',
-    amount: 0,
+    amount: '',
     currency: 'usd',
     status: 'draft',
     description: '',
   });
 
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    onSave({
+      user_id: formData.user_id,
+      amount: Number(formData.amount),
+      currency: formData.currency,
+      status: formData.status,
+      description: formData.description,
+    });
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 py-10 backdrop-blur" onClick={onClose}>
       <div
-        className="bg-gray-900 border border-gray-800 rounded-lg p-8 max-w-2xl w-full"
+        className="w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#06001b] text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold mb-6">Create Invoice</h2>
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <h3 className="text-xl font-semibold">Create invoice</h3>
+          <button
+            onClick={onClose}
+            className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs text-white/60 transition-all hover:border-white/30 hover:text-white"
+          >
+            Close
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5 px-6 py-6">
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Customer</label>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Customer</label>
             <select
               value={formData.user_id}
-              onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
+              onChange={(e) => handleChange('user_id', e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
               required
             >
               <option value="">Select a customer...</option>
@@ -239,64 +266,63 @@ function InvoiceModal({
             </select>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Amount</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Amount</label>
               <input
                 type="number"
-                step="0.01"
-                min="0"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
+                onChange={(e) => handleChange('amount', e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
                 required
               />
             </div>
-
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Currency</label>
-              <select
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Currency</label>
+              <input
                 value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none"
-              >
-                <option value="usd">USD</option>
-                <option value="eur">EUR</option>
-                <option value="gbp">GBP</option>
-              </select>
+                onChange={(e) => handleChange('currency', e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
+                required
+              />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-gray-600 focus:outline-none resize-none"
-              placeholder="Invoice description..."
-              required
-            />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => handleChange('status', e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
+              >
+                <option value="draft">Draft</option>
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.3em] text-white/50">Description</label>
+              <input
+                value={formData.description}
+                onChange={(e) => handleChange('description', e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm focus:border-purple-400/60 focus:outline-none"
+              />
+            </div>
           </div>
 
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-            <p className="text-sm text-yellow-400">
-              Note: This creates a draft invoice. Integration with Stripe payment processing can be
-              added for automatic payment collection.
-            </p>
-          </div>
-
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white px-6 py-3 rounded-lg font-medium hover:from-yellow-500 hover:to-yellow-400 transition-all"
+              className="inline-flex items-center gap-2 rounded-2xl border border-purple-400/40 bg-gradient-to-r from-purple-500 to-fuchsia-500 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition-all hover:shadow-[0_0_35px_rgba(168,85,247,0.35)]"
             >
-              Create Invoice
+              <Sparkles className="h-4 w-4" />
+              Save invoice
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors"
+              className="rounded-2xl border border-white/10 bg-black/40 px-6 py-3 text-sm font-medium text-white/70 transition-all hover:border-white/30 hover:text-white"
             >
               Cancel
             </button>
