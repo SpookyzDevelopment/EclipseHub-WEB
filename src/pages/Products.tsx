@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import PaymentMethods from '../components/PaymentMethods';
-import { Filter, Search, Package } from 'lucide-react';
+import { Filter, Search, Sparkles } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import ProductFeaturesCarousel from '../components/ProductFeaturesCarousel';
 import { supabaseDataService, ProductWithSale } from '../services/supabaseDataService';
+
+const categories = ['all', 'Accounts', 'Security', 'Developer Tools', 'Team Tools', 'Analytics'];
 
 export default function Products() {
   const [products, setProducts] = useState<ProductWithSale[]>([]);
@@ -12,8 +13,6 @@ export default function Products() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  const categories = ['all', 'Accounts', 'Security', 'Developer Tools', 'Team Tools', 'Analytics'];
 
   useEffect(() => {
     fetchProducts();
@@ -41,13 +40,14 @@ export default function Products() {
     let filtered = products;
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.category === selectedCategory);
+      filtered = filtered.filter((p) => p.category === selectedCategory);
     }
 
     if (searchQuery) {
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -58,8 +58,8 @@ export default function Products() {
     return (
       <div className="min-h-screen pt-32 pb-20 px-6 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-gray-500/30 border-t-gray-500 rounded-full animate-spin" />
-          <p className="text-gray-400 text-lg">Loading products...</p>
+          <div className="w-16 h-16 border-4 border-white/10 border-t-indigo-400 rounded-full animate-spin" />
+          <p className="text-slate-300 text-lg">Loading products...</p>
         </div>
       </div>
     );
@@ -68,14 +68,14 @@ export default function Products() {
   if (error) {
     return (
       <div className="min-h-screen pt-32 pb-20 px-6 flex items-center justify-center">
-        <div className="text-center">
-          <Package className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-          <p className="text-red-400 text-lg mb-4">{error}</p>
+        <div className="text-center space-y-4">
+          <Sparkles className="w-14 h-14 text-indigo-300 mx-auto" />
+          <p className="text-rose-300 text-lg">{error}</p>
           <button
             onClick={fetchProducts}
-            className="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-6 py-2 rounded-lg font-medium hover:from-gray-500 hover:to-gray-400 transition-all"
+            className="btn-gradient px-6 py-3 rounded-lg text-sm font-semibold"
           >
-            Try Again
+            Try again
           </button>
         </div>
       </div>
@@ -83,64 +83,82 @@ export default function Products() {
   }
 
   return (
-    <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-black via-gray-950 to-black">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
-            Our <span className="bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent">Products</span>
-          </h1>
-          <p className="text-xl text-gray-400">
-            Explore our complete catalog of premium digital products and services
-          </p>
-        </div>
+    <section className="pt-32 pb-24 px-6 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-[-10%] w-[38rem] h-[38rem] bg-gradient-to-br from-indigo-500/15 via-purple-500/15 to-transparent blur-[240px]" />
+      </div>
 
-        <div className="mb-8 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-gradient-to-br from-gray-900/50 to-gray-900/30 border border-gray-800 p-4 rounded-lg">
-          <div className="relative flex-1 max-w-md w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-900 border border-gray-800 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500/50 transition-colors"
-            />
+      <div className="max-w-7xl mx-auto relative z-10 space-y-12">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+          <div className="space-y-4 max-w-3xl">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs tracking-[0.3em] text-slate-300">
+              <Sparkles className="w-4 h-4 text-indigo-200" /> CATALOGUE
+            </span>
+            <h1 className="text-4xl md:text-5xl font-semibold text-white">
+              Explore Eclipse Hub’s curated library of premium products.
+            </h1>
+            <p className="text-lg text-slate-300">
+              Each solution is configured and tested by our commerce strategists to deliver exceptional customer journeys.
+            </p>
           </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
-            <Filter className="w-5 h-5 text-gray-400 flex-shrink-0" />
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                  selectedCategory === category
-                    ? 'bg-gradient-to-r from-gray-600 to-gray-500 text-white shadow-lg shadow-gray-500/25'
-                    : 'bg-gray-900 text-gray-400 border border-gray-800 hover:border-gray-700'
-                }`}
-              >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </button>
+          <div className="grid sm:grid-cols-3 gap-3 w-full lg:max-w-md">
+            {[{ label: 'Launch velocity', value: '5 days' }, { label: 'Automation coverage', value: '92%' }, { label: 'Client retention', value: '98%' }].map((item) => (
+              <div key={item.label} className="bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center">
+                <p className="text-xl font-semibold text-gradient">{item.value}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{item.label}</p>
+              </div>
             ))}
           </div>
         </div>
 
+        <div className="space-y-6 bg-white/5 border border-white/10 rounded-3xl p-6">
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div className="relative flex-1 max-w-md w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search the collection..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-slate-400 focus:border-indigo-400/50 transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
+              <Filter className="w-5 h-5 text-slate-400 flex-shrink-0" />
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
+                    selectedCategory === category
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-sky-500 text-white shadow-[0_15px_40px_rgba(79,70,229,0.25)]'
+                      : 'bg-white/5 text-slate-300 border border-white/10 hover:border-indigo-400/40'
+                  }`}
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {filteredProducts.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredProducts.map((product, index) => (
               <div
                 key={product.id}
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 50}ms` }}
+                style={{ animation: 'fade-up 0.6s ease-out forwards', animationDelay: `${index * 60}ms`, opacity: 0 }}
               >
                 <ProductCard product={product} />
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20">
-            <Package className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg mb-2">No products found</p>
-            <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+          <div className="text-center py-20 bg-white/5 border border-white/10 rounded-3xl">
+            <Sparkles className="w-12 h-12 text-indigo-300 mx-auto mb-4" />
+            <p className="text-slate-300 text-lg mb-2">No products found</p>
+            <p className="text-slate-500 text-sm">Try adjusting your search or filters to discover more.</p>
           </div>
         )}
       </div>
